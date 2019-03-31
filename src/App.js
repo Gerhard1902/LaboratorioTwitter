@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import './App.css';
 import llama from "./llama.jpg";
-
 
 class Bar extends Component{ // function sintax
   render(){
@@ -13,6 +12,51 @@ class Bar extends Component{ // function sintax
         </div> 
   );
   }
+}
+
+
+class InputTweet extends Component{ // function sintax
+  constructor(props){
+    super(props);
+    this.myRef= React.createRef();
+    this.state={
+      text:"ok",
+      };
+  }
+
+   handleChange =(e)=>{
+   	this.setState({text: e.target.value}) 
+}
+handleClick=(e)=>{
+	
+	this.props.handleClick(e, this.myRef);
+}
+
+  render(){
+  return(
+        <div>
+          <input className="text"type="text" ref={this.myRef} placeholder="What´s happening?" onChange={(e)=>this.handleChange(e)} value={this.state.text}  />
+          <button className="myButton"onClick={(e)=>this.handleClick(e)}>Tweet</button>
+        </div> 
+  );
+  }
+}
+
+
+function Feed(props){
+	return(
+		props.tweets.map((step, index) => {
+        return (
+          <Tweets 
+                className="actualTweet"
+                name={step.name} 
+                date={step.date}
+                message={step.message} 
+              />
+        )
+       })
+
+	);
 }
 
 
@@ -32,7 +76,9 @@ function Tweets (props){ // function sintax
 
 
 
-class Dashboard extends Component {
+
+
+class App extends Component {
   constructor(props){
     super(props);
     this.state={
@@ -41,14 +87,14 @@ class Dashboard extends Component {
       this.myRef= React.createRef();
   }
 
-handleClick =()=>{
- 
+handleClick =(e, childRef)=>{
+ 	console.log(e,childRef);
    const tweets = this.state.tweets.slice();
-    this.myRef.current.focus();
+   childRef.current.focus();
     this.setState({
-      tweets: [...tweets, {name:"Gerardo", date:"11-03-2019", message:this.myRef.current.value} ],
+      tweets: [...tweets, {name:"Gerardo", date:"11-03-2019", message:childRef.current.value} ],
     } );
-    this.myRef.current.value="";
+    childRef.current.value="";
     
 }
 
@@ -60,16 +106,7 @@ handleClick =()=>{
 
     render(){
       const array = this.state.tweets;
-      const myTweets = array.map((step, index) => {
-        return (
-          <Tweets 
-                className="actualTweet"
-                name={this.state.tweets[index].name} 
-                date={this.state.tweets[index].date}
-                message={this.state.tweets[index].message} 
-              />
-        );
-       });
+     
       return(
           <div >
           <div>
@@ -80,23 +117,24 @@ handleClick =()=>{
                 onChange={()=> this.handleChange()}
               />
               <div className="upperBar">
-                <input className="text"type="text" ref={this.myRef} placeholder="What´s happening?" onChange={()=>this.handleChange()}  />
-                <button className="myButton"onClick={()=>this.handleClick()}>Tweet</button>
+                	<InputTweet handleClick={this.handleClick}/>
               </div>
             </div>
             </div>
 
             <div className="actualTweet">
-              {myTweets}
+             	<Feed tweets={array}  />
             </div>
           </div>
       );
     }
 }
 
-export default Dashboard;
 
-//<input type="text" value={this.state.value} onChange={this.handleChange} />
+
+
+
+export default App;
 
 
 
